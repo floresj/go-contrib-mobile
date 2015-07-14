@@ -17,6 +17,8 @@ const (
 	Ipad        = "ipad"
 	Iphone      = "iphone"
 	Ipod        = "ipod"
+	Ios         = "ios"
+	Unknown     = "Unknown"
 	Wap         = "wap"
 	XwapProfile = "X-Wap-Profile"
 	Profile     = "Profile"
@@ -76,15 +78,15 @@ func resolveDevice(header http.Header) Device {
 	if agent != "" {
 		switch {
 		case strings.Contains(agent, Android) && !strings.Contains(agent, Mobile):
-			return &device{tablet: true}
+			return &device{tablet: true, platform: Android}
 		case strings.Contains(agent, Ipad):
-			return &device{tablet: true}
+			return &device{tablet: true, platform: Unknown}
 		case strings.Contains(agent, "silk") && !strings.Contains(agent, Mobile):
-			return &device{tablet: true}
+			return &device{tablet: true, platform: Unknown}
 		default:
 			for _, keyword := range TabletUserAgentKeywords {
 				if strings.Contains(agent, keyword) {
-					return &device{tablet: true}
+					return &device{tablet: true, platform: Unknown}
 				}
 			}
 		}
@@ -98,11 +100,11 @@ func resolveDevice(header http.Header) Device {
 		if agent != "" {
 			switch {
 			case strings.Contains(agent, Android):
-				return &device{mobile: true}
+				return &device{mobile: true, platform: Android}
 			case strings.Contains(agent, Iphone) || strings.Contains(agent, Ipod) || strings.Contains(agent, Ipad):
-				return &device{mobile: true}
+				return &device{mobile: true, platform: Ios}
 			default:
-				return &device{mobile: true}
+				return &device{mobile: true, platform: Unknown}
 			}
 		}
 	}
@@ -112,7 +114,7 @@ func resolveDevice(header http.Header) Device {
 		prefix := agent[:4]
 		for _, uaprefix := range MobileUserAgentPrefixes {
 			if strings.Contains(prefix, uaprefix) {
-				return &device{mobile: true}
+				return &device{mobile: true, platform: Unknown}
 			}
 		}
 	}
@@ -120,27 +122,27 @@ func resolveDevice(header http.Header) Device {
 	// Accept Header check
 	accept := header.Get("Accept")
 	if accept != "" && strings.Contains(accept, Wap) {
-		return &device{mobile: true}
+		return &device{mobile: true, platform: Unknown}
 	}
 
 	// Check Mobile
 	if agent != "" {
 		switch {
 		case strings.Contains(agent, Android):
-			return &device{mobile: true}
+			return &device{mobile: true, platform: Android}
 		case strings.Contains(agent, Iphone) || strings.Contains(agent, Ipod) || strings.Contains(agent, Ipad):
-			return &device{mobile: true}
+			return &device{mobile: true, platform: Ios}
 		default:
 			for _, keyword := range MobileUserAgentKeywords {
 				if strings.Contains(agent, keyword) {
-					return &device{mobile: true}
+					return &device{mobile: true, platform: Unknown}
 				}
 			}
 		}
 	}
 
 	// Assume 'normal' if mobile or tablet was not identified
-	return &device{normal: true}
+	return &device{normal: true, platform: Unknown}
 }
 
 // Shortcut for retrieving a Device object within a handler
