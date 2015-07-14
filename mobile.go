@@ -1,11 +1,12 @@
 // Package mobile provides methods that determine whether a request by a client is coming
 // from a mobile, tablet or normal device. This middleware was inspired by the spring-mobile
 // project https://github.com/spring-projects/spring-mobile
+// Also referenced
+// http://docs.aws.amazon.com/silk/latest/developerguide/user-agent.html
 package mobile
 
 import (
 	"github.com/gin-gonic/gin"
-	"log"
 	"net/http"
 	"strings"
 )
@@ -18,6 +19,8 @@ const (
 	Iphone      = "iphone"
 	Ipod        = "ipod"
 	Ios         = "ios"
+	Kindle      = "Kindle"
+	Silk        = "Silk"
 	Unknown     = "Unknown"
 	Wap         = "wap"
 	XwapProfile = "X-Wap-Profile"
@@ -58,13 +61,12 @@ type Device interface {
 	Platform() string
 }
 
+// Middleware function that parses the User-Agent and other Header properties to determine
+// the type of device being used.
 func Resolver() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		log.Println("Initializing mobile resolver")
 		d := resolveDevice(c.Request.Header)
-		log.Println("Setting the Default Key")
 		c.Set(DefaultKey, d)
-		log.Println("Default key set")
 		c.Next()
 	}
 }
@@ -80,9 +82,9 @@ func resolveDevice(header http.Header) Device {
 		case strings.Contains(agent, Android) && !strings.Contains(agent, Mobile):
 			return &device{tablet: true, platform: Android}
 		case strings.Contains(agent, Ipad):
-			return &device{tablet: true, platform: Unknown}
-		case strings.Contains(agent, "silk") && !strings.Contains(agent, Mobile):
-			return &device{tablet: true, platform: Unknown}
+			return &device{tablet: true, platform: Ipad}
+		case strings.Contains(agent, Silk) && !strings.Contains(agent, Mobile):
+			return &device{tablet: true, platform: Kindle}
 		default:
 			for _, keyword := range TabletUserAgentKeywords {
 				if strings.Contains(agent, keyword) {
@@ -165,7 +167,7 @@ func (d *device) Tablet() bool {
 	return d.tablet
 }
 
-// Returns the device platform. Possible values include IOS, Android or Unknown
+// Returns the device platform. Possible values include IOS, Android, Kindle or Unknown
 func (d *device) Platform() string {
 	return d.platform
 }
