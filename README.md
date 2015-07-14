@@ -1,5 +1,5 @@
 # go-contrib-mobile
-A middleware for gin-gonic that determines whether a user is using a mobile, tablet or normal device.
+A middleware for gin-gonic that determines whether a user is using a mobile, tablet or normal device. This middleware was inspired by the [spring-mobile](https://github.com/spring-projects/spring-mobile) project by the good folks from the spring framework.
 
 # Examples
 ```go
