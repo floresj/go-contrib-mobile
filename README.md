@@ -1,4 +1,6 @@
 # go-contrib-mobile
+[![wercker status](https://app.wercker.com/status/f51162a8f18f296de9285aa36a8e984c/s "wercker status")](https://app.wercker.com/project/bykey/f51162a8f18f296de9285aa36a8e984c)
+
 A middleware for gin-gonic that determines whether a user is using a mobile, tablet or normal device. This middleware was inspired by the [spring-mobile](https://github.com/spring-projects/spring-mobile) project by the good folks from the spring framework.
 
 # Examples
