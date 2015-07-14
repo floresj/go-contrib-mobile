@@ -34,4 +34,5 @@ func init() {
 			c.HTML(http.StatusOK, "index.tablet.tmpl", nil)
 		}
 	})
+}
 ```
